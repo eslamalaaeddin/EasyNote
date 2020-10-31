@@ -161,7 +161,9 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener, NotesA
         if (auth.currentUser == null) {
             goToLoginRegisterActivity()
         }
-        initRecyclerView(auth.currentUser!!)
+        else{
+            initRecyclerView(auth.currentUser!!)
+        }
     }
 
     private fun addNote(text: String) {
