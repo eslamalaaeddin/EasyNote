@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "387027301030",
+    "firebase_url": "https://easynote-4527e.firebaseio.com",
+    "project_id": "easynote-4527e",
+    "storage_bucket": "easynote-4527e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:387027301030:android:7e23318ee256b1baf43a67",
+        "android_client_info": {
+          "package_name": "com.example.easynote"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "387027301030-v7lm45fln6s1ru5nns62tep83i7qks4q.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAdoTPnqN9RUJfH_dm6KuFT20RrfqxLLJc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "387027301030-v7lm45fln6s1ru5nns62tep83i7qks4q.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
