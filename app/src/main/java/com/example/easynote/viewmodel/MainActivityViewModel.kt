@@ -11,9 +11,9 @@ import com.google.firebase.firestore.DocumentReference
 
 private const val TAG = "MainActivityViewModel"
 
-class MainActivityViewModel : ViewModel() {
+class MainActivityViewModel(private val repository: Repository) : ViewModel() {
 
-    private val repository = Repository()
+    //private val repository = Repository()
 
     fun addNote(note: Note) : Task<DocumentReference>{
         return repository.addNote(note)

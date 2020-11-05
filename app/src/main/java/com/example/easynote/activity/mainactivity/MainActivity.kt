@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.easynote.R
 import com.example.easynote.activity.LoginRegisterActivity
 import com.example.easynote.activity.ProfileActivity
@@ -27,6 +28,7 @@ import com.google.firebase.firestore.DocumentSnapshot
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 private const val TAG = "MainActivity"
 
@@ -34,13 +36,11 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener,
     NotesAdapter.NoteListener {
     private lateinit var auth: FirebaseAuth
     private var notesAdapter: NotesAdapter? = null
-    private lateinit var viewModel: MainActivityViewModel
+    private val viewModel by viewModel<MainActivityViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        viewModel = ViewModelProvider(this).get(MainActivityViewModel::class.java)
 
         setSupportActionBar(toolbar)
 
@@ -231,6 +231,7 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener,
             }
             .setNegativeButton("Cancel", null)
             .show()
+
 
     }
 

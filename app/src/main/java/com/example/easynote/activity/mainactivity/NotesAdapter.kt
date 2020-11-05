@@ -10,7 +10,7 @@ import com.example.easynote.model.Note
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.firebase.firestore.DocumentSnapshot
-import kotlinx.android.synthetic.main.note_row.view.*
+import kotlinx.android.synthetic.main.note_item.view.*
 
 class NotesAdapter(private val options: FirestoreRecyclerOptions<Note>, private val listener: NoteListener) :
     FirestoreRecyclerAdapter<Note, NotesAdapter.NotesViewHolder>(options) {
@@ -24,7 +24,7 @@ class NotesAdapter(private val options: FirestoreRecyclerOptions<Note>, private 
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NotesViewHolder {
-        val view  = LayoutInflater.from(parent.context).inflate(R.layout.note_row, parent, false)
+        val view  = LayoutInflater.from(parent.context).inflate(R.layout.note_item, parent, false)
         return NotesViewHolder(view)
     }
 
