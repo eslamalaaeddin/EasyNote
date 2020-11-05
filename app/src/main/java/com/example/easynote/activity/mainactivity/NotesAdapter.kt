@@ -1,18 +1,15 @@
-package com.example.easynote
+package com.example.easynote.activity.mainactivity
 
-import android.text.format.DateFormat
 import android.text.format.DateFormat.format
 import android.view.LayoutInflater
-import android.view.TextureView
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CheckBox
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.easynote.R
+import com.example.easynote.model.Note
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.note_row.view.*
 
 class NotesAdapter(private val options: FirestoreRecyclerOptions<Note>, private val listener: NoteListener) :

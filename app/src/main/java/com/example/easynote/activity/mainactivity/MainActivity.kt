@@ -1,8 +1,7 @@
-package com.example.easynote
+package com.example.easynote.activity.mainactivity
 
 import android.content.Intent
 import android.graphics.Canvas
-import android.graphics.Color.red
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -11,40 +10,43 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.example.easynote.R
+import com.example.easynote.activity.LoginRegisterActivity
+import com.example.easynote.activity.ProfileActivity
+import com.example.easynote.model.Note
+import com.example.easynote.viewmodel.MainActivityViewModel
 import com.firebase.ui.auth.AuthUI
-import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 
-class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener, NotesAdapter.NoteListener {
+private const val TAG = "MainActivity"
+
+class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener,
+    NotesAdapter.NoteListener {
     private lateinit var auth: FirebaseAuth
-    private lateinit var database: FirebaseFirestore
-    private var notesAdapter : NotesAdapter? = null
+    private var notesAdapter: NotesAdapter? = null
+    private lateinit var viewModel: MainActivityViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        viewModel = ViewModelProvider(this).get(MainActivityViewModel::class.java)
+
         setSupportActionBar(toolbar)
 
         auth = FirebaseAuth.getInstance()
-        database = FirebaseFirestore.getInstance()
 
-        notesRecyclerView.addItemDecoration(
-            DividerItemDecoration(
-                this,
-                DividerItemDecoration.VERTICAL
-            )
-        )
+        notesRecyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
 
         fab.setOnClickListener {
             showAlertDialog()
@@ -77,7 +79,15 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener, NotesA
                     isCurrentlyActive: Boolean
                 ) {
                     RecyclerViewSwipeDecorator
-                        .Builder(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+                        .Builder(
+                            c,
+                            recyclerView,
+                            viewHolder,
+                            dX,
+                            dY,
+                            actionState,
+                            isCurrentlyActive
+                        )
                         .addBackgroundColor(
                             ContextCompat.getColor(
                                 this@MainActivity,
@@ -147,7 +157,7 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener, NotesA
         AuthUI.getInstance().signOut(this)
     }
 
-    private fun goToProfileActivity(){
+    private fun goToProfileActivity() {
         val intent = Intent(this, ProfileActivity::class.java)
         startActivity(intent)
     }
@@ -160,8 +170,7 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener, NotesA
     override fun onAuthStateChanged(auth: FirebaseAuth) {
         if (auth.currentUser == null) {
             goToLoginRegisterActivity()
-        }
-        else{
+        } else {
             initRecyclerView(auth.currentUser!!)
         }
     }
@@ -170,28 +179,18 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener, NotesA
         val userId = auth.currentUser?.uid.toString()
         val note = Note(text, false, userId)
 
-        database.collection("notes")
-            .add(note)
-            .addOnSuccessListener {
-                Toast.makeText(this, "Note added.", Toast.LENGTH_SHORT).show()
-            }.addOnFailureListener {
-                Toast.makeText(this, "${it.message}", Toast.LENGTH_SHORT).show()
+        viewModel.addNote(note).addOnCompleteListener {
+                if (it.isSuccessful) {
+                    Toast.makeText(this, "Note added.", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, "${it.exception?.message}", Toast.LENGTH_SHORT).show()
+                }
             }
-
     }
 
-    private fun initRecyclerView(firebaseUser: FirebaseUser){
-        //1 creating the query
-        val query = database.collection("notes")
-            .whereEqualTo("userId", firebaseUser.uid)
-            .orderBy("completed", Query.Direction.ASCENDING)
-            .orderBy("created", Query.Direction.DESCENDING)
+    private fun initRecyclerView(firebaseUser: FirebaseUser) {
+        val options = viewModel.queryNotesForRecyclerView(firebaseUser)
 
-        //2 creating the options
-        val options : FirestoreRecyclerOptions<Note> = FirestoreRecyclerOptions
-                .Builder<Note>()
-                .setQuery(query, Note::class.java)
-                .build()
         //3 initializing the adapter
         notesAdapter = NotesAdapter(options, this)
 
@@ -204,53 +203,51 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener, NotesA
     }
 
     override fun onCheckBoxClicked(isChecked: Boolean, documentSnapshot: DocumentSnapshot) {
-        documentSnapshot.reference.update("completed", isChecked).addOnSuccessListener {
-            Toast.makeText(this, "Updated", Toast.LENGTH_SHORT).show()
-        }.addOnFailureListener {
+        viewModel.updateNote(documentSnapshot.reference,"completed", isChecked).addOnFailureListener {
             Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
         }
     }
 
     override fun onNoteClicked(documentSnapshot: DocumentSnapshot) {
-        val note = documentSnapshot.toObject(Note::class.java)
-        val text = note?.text
         val editText = EditText(this)
-        editText.setText(text)
-        note?.text?.length?.let { editText.setSelection(it) }
+        val noteLiveData = viewModel.getNoteLiveData(documentSnapshot.id)
+        noteLiveData?.observe(this, { note ->
+            val text = note?.text
+            editText.setText(text)
+            note?.text?.length?.let { editText.setSelection(it) }
 
+        })
 
         AlertDialog.Builder(this)
             .setTitle("Update note")
             .setView(editText)
-            .setPositiveButton(
-                "Update"
-            ) { _, _ ->
-                val newText =  editText.text.toString()
-
-                documentSnapshot.reference
-                .update("text", newText).addOnSuccessListener {
-                    Toast.makeText(this, "Note updated.", Toast.LENGTH_SHORT).show()
+            .setPositiveButton("Update") { _, _ ->
+                val newText = editText.text.toString()
+                viewModel.updateNote(documentSnapshot.reference,"text",newText).addOnSuccessListener {
+                    Toast.makeText(this, "Updated", Toast.LENGTH_SHORT).show()
                 }.addOnFailureListener {
-                    Toast.makeText(this, "${it.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Failed", Toast.LENGTH_SHORT).show()
                 }
             }
             .setNegativeButton("Cancel", null)
             .show()
+
     }
 
     override fun onItemSwiped(documentSnapshot: DocumentSnapshot) {
         val note = documentSnapshot.toObject(Note::class.java)
-        documentSnapshot.reference.delete().addOnSuccessListener {
+        viewModel.deleteNote(documentSnapshot.reference).addOnSuccessListener {
             Snackbar.make(notesRecyclerView, "Note deleted", Snackbar.LENGTH_LONG)
                 .setAction("Undo") {
                     if (note != null) {
-                        documentSnapshot.reference.set(note)
+                        viewModel.setNote(documentSnapshot.reference, note)
                     }
                 }
                 .show()
         }.addOnFailureListener {
             Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
         }
+
     }
 
 

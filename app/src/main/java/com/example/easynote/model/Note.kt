@@ -1,4 +1,4 @@
-package com.example.easynote
+package com.example.easynote.model
 
 import com.google.firebase.Timestamp
 import java.util.*
