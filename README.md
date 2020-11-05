@@ -8,3 +8,14 @@ CloudStorage
 ---
 FirebaseAuthentication
 ---
+MVVM
+---
+RepositoryPattern
+---
+ViewModel
+---
+LiveData
+---
+
+
+
