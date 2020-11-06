@@ -1,4 +1,4 @@
-package com.example.easynote.activity.mainactivity
+package com.example.easynote.ui
 
 import android.content.Intent
 import android.graphics.Canvas
@@ -10,14 +10,11 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.easynote.R
-import com.example.easynote.activity.LoginRegisterActivity
-import com.example.easynote.activity.ProfileActivity
+import com.example.easynote.adapter.NotesAdapter
 import com.example.easynote.model.Note
 import com.example.easynote.viewmodel.MainActivityViewModel
 import com.firebase.ui.auth.AuthUI
@@ -28,13 +25,16 @@ import com.google.firebase.firestore.DocumentSnapshot
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
+import org.koin.android.ext.android.get
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 private const val TAG = "MainActivity"
 
 class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener,
     NotesAdapter.NoteListener {
-    private lateinit var auth: FirebaseAuth
+    private val auth: FirebaseAuth by inject()
+    private val authUI : AuthUI by inject()
     private var notesAdapter: NotesAdapter? = null
     private val viewModel by viewModel<MainActivityViewModel>()
 
@@ -43,8 +43,6 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener,
         setContentView(R.layout.activity_main)
 
         setSupportActionBar(toolbar)
-
-        auth = FirebaseAuth.getInstance()
 
         notesRecyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
 
@@ -154,7 +152,7 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener,
     }
 
     private fun logoutAndGoToLoginRegisterActivity() {
-        AuthUI.getInstance().signOut(this)
+        authUI.signOut(this)
     }
 
     private fun goToProfileActivity() {

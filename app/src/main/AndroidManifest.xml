@@ -11,10 +11,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".activity.ProfileActivity" />
-        <activity android:name=".activity.LoginRegisterActivity" />
+        <activity android:name=".ui.ProfileActivity" />
+        <activity android:name=".ui.LoginRegisterActivity" />
         <activity
-            android:name=".activity.mainactivity.MainActivity"
+            android:name=".ui.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>

@@ -1,4 +1,4 @@
-package com.example.easynote.activity.mainactivity
+package com.example.easynote.adapter
 
 import android.text.format.DateFormat.format
 import android.view.LayoutInflater

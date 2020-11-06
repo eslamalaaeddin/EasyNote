@@ -1,28 +1,29 @@
-package com.example.easynote.activity
+package com.example.easynote.ui
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
 import com.example.easynote.R
-import com.example.easynote.activity.mainactivity.MainActivity
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.android.synthetic.main.activity_login_register.*
+import org.koin.android.ext.android.inject
 
 private const val AUTH_UI_REQUEST_CODE = 159
 
 class LoginRegisterActivity : AppCompatActivity() {
-    private lateinit var auth: FirebaseAuth
+    private val auth: FirebaseAuth by inject()
+    private val authUI : AuthUI by inject()
+
     private var user: FirebaseUser? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login_register)
 
-        auth = FirebaseAuth.getInstance()
         user = auth.currentUser
 
         if (user != null) {
@@ -43,7 +44,7 @@ class LoginRegisterActivity : AppCompatActivity() {
             AuthUI.IdpConfig.PhoneBuilder().build()
         )
         //2
-        val intent = AuthUI.getInstance()
+        val intent = authUI
             .createSignInIntentBuilder()
             .setAvailableProviders(providers)
             .setLogo(R.drawable.notes)

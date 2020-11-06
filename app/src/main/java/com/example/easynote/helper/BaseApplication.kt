@@ -1,9 +1,7 @@
 package com.example.easynote.helper
 
 import android.app.Application
-import com.example.easynote.di.databaseModule
-import com.example.easynote.di.repositoryModule
-import com.example.easynote.di.viewModelModule
+import com.example.easynote.di.*
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -15,7 +13,12 @@ class BaseApplication : Application() {
         startKoin {
             androidLogger(Level.DEBUG)
             androidContext(this@BaseApplication)
-            modules(listOf(repositoryModule, viewModelModule, databaseModule))
+            modules(listOf(repositoryModule,
+                viewModelModule,
+                databaseModule,
+                firebaseAuthModule,
+                firebaseAuthUIModule,
+                firebaseStorageModule))
         }
     }
 }

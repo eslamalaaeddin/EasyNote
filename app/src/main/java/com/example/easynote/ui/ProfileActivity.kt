@@ -1,4 +1,4 @@
-package com.example.easynote.activity
+package com.example.easynote.ui
 
 import android.content.Intent
 import android.graphics.Bitmap
@@ -13,13 +13,17 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_profile.*
+import org.koin.android.ext.android.inject
 import java.io.ByteArrayOutputStream
 
 private const val TAG = "ProfileActivity"
 private const val REQUEST_CODE = 159
 
 class ProfileActivity : AppCompatActivity() {
-    private val user = FirebaseAuth.getInstance().currentUser
+    private val auth: FirebaseAuth by inject()
+    private val firebaseStorage : FirebaseStorage by inject()
+    private val user = auth.currentUser
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
@@ -84,10 +88,10 @@ class ProfileActivity : AppCompatActivity() {
     }
 
     private fun uploadImageToCloudStorage(bitmap: Bitmap) {
-        val userId = FirebaseAuth.getInstance().currentUser?.uid.toString()
+        val userId = auth.currentUser?.uid.toString()
 
         val firebaseStorageRef =
-            FirebaseStorage.getInstance().reference.child("Profile images").child("${userId}.jpeg")
+            firebaseStorage.reference.child("Profile images").child("${userId}.jpeg")
 
         val byteArrayOutputStream = ByteArrayOutputStream()
 

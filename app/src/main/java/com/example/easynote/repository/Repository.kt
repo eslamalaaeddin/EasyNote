@@ -11,7 +11,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 
 class Repository (private val db : FirebaseFirestore) {
-    //private val db = FirebaseFirestore.getInstance()
 
     fun addNote(note : Note) : Task<DocumentReference>{
        return db.collection("notes").add(note)
